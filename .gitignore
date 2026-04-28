@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+.venv/
+venv/
+env/
+
+# Local secrets — copy from detector/config.example.yaml
+detector/config.yaml
+
+# Env files
+.env
+.env.*
+
+# Runtime logs
+*.log
+audit.log
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

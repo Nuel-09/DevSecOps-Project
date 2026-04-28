@@ -1,0 +1,32 @@
+# Copy to config.yaml and adjust (config.yaml is gitignored — do not commit webhooks).
+# Docker Compose sets DETECTOR_LOG_FILE=/var/log/nginx/hng-access.log for the detector container.
+
+log_file: /var/log/nginx/hng-access.log
+poll_interval_seconds: 0.2
+
+baseline:
+  rolling_window_minutes: 30
+  recalculation_interval_seconds: 60
+  min_samples_current_hour: 300
+  floor_mean: 0.1
+  floor_stddev: 0.1
+
+detection:
+  zscore_threshold: 3.0
+  mean_multiplier_threshold: 5.0
+  error_surge_multiplier: 3.0
+  tightened_zscore_threshold: 2.0
+  tightened_mean_multiplier_threshold: 3.0
+
+blocking:
+  use_iptables: false
+
+notifier:
+  slack_webhook_url: ""
+
+audit:
+  log_path: ./audit.log
+
+dashboard:
+  host: 0.0.0.0
+  port: 5000
