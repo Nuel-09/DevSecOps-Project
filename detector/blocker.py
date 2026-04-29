@@ -3,6 +3,11 @@ from datetime import datetime, timedelta, timezone
 from typing import Dict, Optional
 
 
+# Docker publishes ports via iptables FORWARD/DOCKER paths; blocking in INPUT alone often misses
+# traffic to mapped ports (e.g. 8080->nginx). DOCKER-USER is the supported hook for host-level drops.
+IPTABLES_CHAIN = "DOCKER-USER"
+
+
 class IPBlocker:
     def __init__(self, use_iptables: bool = False) -> None:
         self.use_iptables = use_iptables
@@ -14,7 +19,7 @@ class IPBlocker:
 
         if self.use_iptables:
             subprocess.run(
-                ["iptables", "-I", "INPUT", "-s", ip, "-j", "DROP"],
+                ["iptables", "-I", IPTABLES_CHAIN, "-s", ip, "-j", "DROP"],
                 check=True,
                 capture_output=True,
                 text=True,
@@ -37,7 +42,7 @@ class IPBlocker:
 
         if self.use_iptables:
             subprocess.run(
-                ["iptables", "-D", "INPUT", "-s", ip, "-j", "DROP"],
+                ["iptables", "-D", IPTABLES_CHAIN, "-s", ip, "-j", "DROP"],
                 check=True,
                 capture_output=True,
                 text=True,

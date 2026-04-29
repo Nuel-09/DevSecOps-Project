@@ -20,20 +20,26 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - HNG-nginx-logs:/var/log/nginx
 
+  # Host network + NET_ADMIN: iptables inside this service applies to the REAL host
+  # (bridge networking would only change rules inside the container, so "iptables -L" on the host stayed empty).
   detector:
     build:
       context: .
       dockerfile: detector/Dockerfile
     container_name: hng-detector
     restart: unless-stopped
+    # Share host network + permission to change host netfilter (grading: iptables -L on VPS shows bans).
+    network_mode: host
+    privileged: true
+    cap_add:
+      - NET_ADMIN
     depends_on:
       - nginx
     environment:
       - DETECTOR_LOG_FILE=/var/log/nginx/hng-access.log
       - DASHBOARD_HOST=0.0.0.0
-      - DASHBOARD_PORT=5000
-    ports:
-      - "8090:5000"
+      # With network_mode: host, publish the dashboard on the host (not 8090:5000 mapping).
+      - DASHBOARD_PORT=8090
     volumes:
       - HNG-nginx-logs:/var/log/nginx:ro
 
